@@ -52,4 +52,69 @@ plt.title(f"Release date album all lists")
 
 print(data[data['Album Release Date'] < '1990'][['Track Name','Artist Name', 'Album Release Date']])
 
+#%% Nieuwste nummers
 
+
+print(data[data['Album Release Date'] > '2020-08'][['Track Name','Artist Name', 'Album Release Date']])
+
+
+#%% Bands het vaak erin
+
+num_per_band = data.groupby('Artist Name')['Track URI'].nunique()
+num_per_band_edited = num_per_band.copy()
+for total_artist in num_per_band.index:
+    artists = total_artist.split(", ")
+    if len(artists) > 1:
+        for artist in artists:
+            try:
+                num_per_band_edited[artist] += 1
+            except:
+                num_per_band_edited[artist] = 1
+                
+        num_per_band_edited = num_per_band_edited.drop(total_artist) 
+            
+
+#%%
+
+sorted_num_per_band = num_per_band_edited.sort_values()[num_per_band_edited > 4]
+sorted_num_per_band.plot.bar(figsize = (12,8))
+plt.ylabel("Aantal nummers")
+plt.xlabel("")
+plt.title("Aantal nummers per artiest dat in Sjoerd 1 t/m 3 staat")
+
+
+#%% Album het vaak erin
+
+num_per_band = data.groupby('Album Name')['Track URI'].nunique()
+num_per_band_edited = num_per_band.copy()
+for total_artist in num_per_band.index:
+    artists = total_artist.split(", ")
+    if len(artists) > 1:
+        for artist in artists:
+            try:
+                num_per_band_edited[artist] += 1
+            except:
+                num_per_band_edited[artist] = 1
+                
+        num_per_band_edited = num_per_band_edited.drop(total_artist) 
+            
+
+#%%
+
+sorted_num_per_band = num_per_band_edited.sort_values()[num_per_band_edited > 4]
+sorted_num_per_band.plot.bar(figsize = (12,8))
+plt.ylabel("Aantal nummers")
+plt.xlabel("")
+plt.title("Aantal nummers per album dat in Sjoerd 1 t/m 3 staat")
+
+#%% Hist duration
+
+(data['Track Duration (ms)']/60000).hist(bins = 30)
+
+
+
+#%% Did lengths change?
+
+data_year = data.groupby(data['Album Release Date'].dt.year).mean()
+
+(data_year['Track Duration (ms)']/60000).plot()
